@@ -1,0 +1,4 @@
+sudo apt-get install raspberrypi-kernel-headers build-essential dkms git
+git clone https://github.com/Mange/rtl8192eu-linux-driver
+make ARCH=arm
+make install
