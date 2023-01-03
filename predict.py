@@ -2,34 +2,41 @@
 #print('Memory (Before): ' + str(memory_usage()) + 'MB' )
 
 import tensorflow as tf
-import tensorflow_hub as hub
 import numpy as np
 import csv
 import struct
-import matplotlib.pyplot as plt
-from IPython.display import Audio
-from scipy.io import wavfile
 import scipy
 
 
 # Load the model.
-model = hub.load('https://tfhub.dev/google/yamnet/1')
+def load_model():
+  interpreter = tf.lite.Interpreter('yamnet_1.tflite')
 
+  input_details = interpreter.get_input_details()
+  waveform_input_index = input_details[0]['index']
+  output_details = interpreter.get_output_details()
+  scores_output_index = output_details[0]['index']
+  embeddings_output_index = output_details[1]['index']
+  spectrogram_output_index = output_details[2]['index']
+
+  return interpreter, input_details, waveform_input_index, output_details, scores_output_index, embeddings_output_index, spectrogram_output_index
+
+
+model, input_details, waveform_input_index, output_details, scores_output_index, embeddings_output_index, spectrogram_output_index = load_model()
 
 
 # Find the name of the class with the top score when mean-aggregated across frames.
 def class_names_from_csv(class_map_csv_text):
   """Returns list of class names corresponding to score vector."""
   class_names = []
-  with tf.io.gfile.GFile(class_map_csv_text) as csvfile:
+  with open(class_map_csv_text) as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
       class_names.append(row['display_name'])
 
   return class_names
 
-class_map_path = model.class_map_path().numpy()
-class_names = class_names_from_csv(class_map_path)
+class_names = class_names_from_csv('yamnet_class_map.csv')
 
 
 def ensure_sample_rate(original_sample_rate, waveform,
@@ -44,8 +51,6 @@ def ensure_sample_rate(original_sample_rate, waveform,
 
 def predict(frames, sample_rate=16000):
   wav_data = np.array([struct.unpack('1024h', frame) for frame in frames]).flatten()
-  #sample_rate, wav_data = ensure_sample_rate(sample_rate, wav_data)
-
 
   # Show some basic information about the audio.
   duration = len(wav_data)/sample_rate
@@ -54,19 +59,24 @@ def predict(frames, sample_rate=16000):
   print(f'Size of the input: {len(wav_data)}')
 
 
-  # Listening to the wav file.
-  #Audio(wav_data, rate=sample_rate)
-
   # data scaling
   waveform = wav_data / tf.int16.max
+  waveform = waveform.astype(np.float32)
 
-  # Run the model, check the output.
-  scores, embeddings, spectrogram = model(waveform)
+  # prediction
+  model.resize_tensor_input(waveform_input_index, [len(waveform)], strict=True)
+  model.allocate_tensors()
+  model.set_tensor(waveform_input_index, waveform)
+  model.invoke()
+  scores, embeddings, spectrogram = (
+      model.get_tensor(scores_output_index),
+      model.get_tensor(embeddings_output_index),
+      model.get_tensor(spectrogram_output_index))
 
-  scores_np = scores.numpy()
-  spectrogram_np = spectrogram.numpy()
-  infered_class = class_names[scores_np.mean(axis=0).argmax()]
+
+  infered_class = class_names[scores.mean(axis=0).argmax()]
   print(f'The main sound is: {infered_class}')
 
-#predict_file('test.wav')
+
+#predict('test.wav')
 #print('Memory (After) : ' + str(memory_usage()) + 'MB')
