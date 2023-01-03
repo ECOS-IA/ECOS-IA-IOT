@@ -1,3 +1,6 @@
+from memory_profiler import memory_usage
+print('Memory (Before): ' + str(memory_usage()) + 'MB' )
+
 import pyaudio
 import wave
 import time
@@ -34,6 +37,7 @@ try:
         val=val+1
 
 except KeyboardInterrupt:
+    print('Memory (After) : ' + str(memory_usage()) + 'MB')
     wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(p.get_sample_size(FORMAT))
