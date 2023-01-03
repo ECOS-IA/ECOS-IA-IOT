@@ -1,3 +1,4 @@
 pyaudio
 memory-profiler
+scipy
 # INSTALL TENSORFLOW https://www.youtube.com/watch?v=vekblEk6UPc
