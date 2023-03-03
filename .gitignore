@@ -3,3 +3,6 @@ __pycache__
 *.pickle
 iot_prev.py
 *.wav
+yamnet
+a.py
+datasets
