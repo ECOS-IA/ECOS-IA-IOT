@@ -3,7 +3,6 @@ print('Memory (Before): ' + str(memory_usage()) + 'MB' )
 
 import pyaudio
 import wave
-import time
 from predict import predict, send_to_server
 import threading
 from datetime import datetime
@@ -12,7 +11,7 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
-RECORD_SECONDS = 5
+RECORD_SECONDS = 6
 WAVE_OUTPUT_FILENAME = "output.wav"
 
 SERVER_IP = "192.168.1.172"

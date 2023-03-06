@@ -1,9 +1,5 @@
-#from memory_profiler import memory_usage
-#print('Memory (Before): ' + str(memory_usage()) + 'MB' )
-
 import tensorflow as tf
 import numpy as np
-import csv
 import struct
 import scipy
 import requests
@@ -19,15 +15,13 @@ def load_model():
   waveform_input_index = input_details[0]['index']
   output_details = interpreter.get_output_details()
   scores_output_index = output_details[0]['index']
-  #embeddings_output_index = output_details[1]['index']
-  #spectrogram_output_index = output_details[2]['index']
 
   return interpreter, input_details, waveform_input_index, output_details, scores_output_index
 
 
 model, input_details, waveform_input_index, output_details, scores_output_index = load_model()
-my_classes = ["chainsaw", "fireworks", "crackling_fire", "engine","thunderstorm","wind","dog"]
-map_class_to_id = {"chainsaw":0, "fireworks":1, "crackling_fire":2, "engine":3, "thunderstorm":4, "wind":5, "dog":6}
+my_classes = ["chainsaw", "fireworks", "crackling_fire", "engine","thunderstorm","wind","dog","silence"]
+map_class_to_id = {"chainsaw":0, "fireworks":1, "crackling_fire":2, "engine":3, "thunderstorm":4, "wind":5, "dog":6, "silence":7}
 
 
 def ensure_sample_rate(original_sample_rate, waveform,
@@ -74,8 +68,5 @@ def send_to_server(data):
 
     if data["label"] in danger_list and data["probability"] > 0.9:
       print("send to server.....")
-      res = requests.post(f"http://{data['server_ip']}:4000/alert", data=json.dumps(data))
-      print(res.text)
-
-#predict('test.wav')
-#print('Memory (After) : ' + str(memory_usage()) + 'MB')
+      #res = requests.post(f"http://{data['server_ip']}:4000/alert", data=json.dumps(data))
+      #print(res.text)
