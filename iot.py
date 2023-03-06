@@ -14,7 +14,8 @@ RATE = 16000
 RECORD_SECONDS = 6 
 WAVE_OUTPUT_FILENAME = "output.wav"
 
-SERVER_IP = "192.168.1.172"
+#SERVER_IP = "192.168.1.172"
+SERVER_IP = "localhost"
 RASP_ID = 2
 
 p = pyaudio.PyAudio()
