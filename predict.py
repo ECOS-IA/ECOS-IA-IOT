@@ -67,7 +67,7 @@ def send_to_server(data):
     danger_list = ["chainsaw", "fireworks", "crackling_fire", "engine"]
 
     print(data)
-    if data["label"] in danger_list and data["probability"] > 0.4:
+    if data["label"] in danger_list and data["probability"] > 0.9:
       del data["probability"]
       print("send alert to server.....")
       res = requests.post(f"http://{data['server_ip']}:4000/alert", data=json.dumps(data))
