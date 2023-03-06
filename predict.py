@@ -66,7 +66,6 @@ def predict(frames, sample_rate=16000):
 def send_to_server(data):
     danger_list = ["chainsaw", "fireworks", "crackling_fire", "engine"]
 
-    print(data)
     if data["label"] in danger_list and data["probability"] > 0.9:
       del data["probability"]
       print("send alert to server.....")
